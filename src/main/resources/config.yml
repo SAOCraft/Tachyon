@@ -1,0 +1,8 @@
+server:
+  brand: "SwordCraft"
+  address: "0.0.0.0"
+  reconnect-delay: 2 # In seconds (0 to disable)
+  port: 25565
+  online-mode: true
+  max-players: 20
+  motd: "<gradient:#ff0000:#ffff00> SwordCraft </gradient>"
