@@ -101,7 +101,7 @@ object Tachyon {
             if (msg is String)
                 tags.add(TagResolver.resolver(it, Tag.inserting(Component.text(msg))))
         }
-        Tachyon.miniMessage = MiniMessage.builder().tags(
+        miniMessage = MiniMessage.builder().tags(
             TagResolver.builder()
                 .resolver(TagResolver.standard())
                 .resolvers(tags)
