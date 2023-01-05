@@ -46,8 +46,7 @@ publishing {
             artifactId = "Tachyon"
             version = "1.0"
 
-            //from(components["java"])
-            artifact(tasks["shadowJar"])
+            from(components["java"])
         }
     }
 }
