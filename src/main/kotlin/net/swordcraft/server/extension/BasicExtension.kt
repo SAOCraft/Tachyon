@@ -9,17 +9,20 @@ import java.io.File
 open class BasicExtension : Extension() {
 
     val dataDir = File("${Tachyon.serverPath}/extensions/${this.origin.name}").apply { if (!exists()) mkdirs() }
-    lateinit var config: YamlDocument
+    var config: YamlDocument? = null
 
     override fun initialize() {
-        this::class.java.getResourceAsStream("config.yml")
-            ?: throw Exception("Config file not found... unloading extension ${this.origin.name}")
-        val configFile = File(dataDir, "config.yml").checkResource("config.yml")
-        config = YamlDocument.create(configFile)
         logger.info("Loaded ${this.origin.name} extension")
     }
 
     override fun terminate() {
+    }
+
+    protected fun saveDefaultConfig(overwrite: Boolean = false) {
+        val config = File("${dataDir.absolutePath}/config.yml")
+        if (!config.exists()) {
+            config.checkResource("config.yml", overwrite)
+        }
     }
 
 }
