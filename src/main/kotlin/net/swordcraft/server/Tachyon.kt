@@ -15,7 +15,6 @@ import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.event.player.PlayerLoginEvent
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
-import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.ping.ServerListPingType
 import net.swordcraft.server.database.DatabaseStorage
 import net.swordcraft.server.utils.MOTD
@@ -38,7 +37,7 @@ object Tachyon {
     val messages: YamlDocument = createInternalConfig("messages.yml", "messages.yml")
 
     lateinit var miniMessage: MiniMessage
-    lateinit var world: InstanceContainer
+    lateinit var world: TickTrackingInstanceContainer
 
     val database: DatabaseStorage = DatabaseStorage(
         config.getString("database.name", "data"),
@@ -53,7 +52,8 @@ object Tachyon {
         buildMiniMessage()
         registerInternalListeners()
         checkOnlineMode()
-        world = MinecraftServer.getInstanceManager().createInstanceContainer()
+        world = TickTrackingInstanceContainer()
+        MinecraftServer.getInstanceManager().registerInstance(world)
         MinecraftServer.setBrandName(config.getString("server.brand", "SwordCraft"))
         val address = config.getString("server.address", "0.0.0.0")
         val port = config.getInt("server.port", 25565)
