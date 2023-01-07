@@ -5,6 +5,13 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
+// Used for the test server
+val copyDirectory = File("D:\\GitHub\\SAOCraft\\TestServer").apply {
+    if (!exists()) {
+        mkdirs()
+    }
+}
+
 group = "net.swordcraft.server"
 version = "1.0"
 
@@ -33,6 +40,12 @@ tasks {
             attributes(
                 "Main-Class" to "net.swordcraft.server.Tachyon"
             )
+        }
+        doLast {
+            copy {
+                from(archiveFile.get().asFile)
+                into(copyDirectory)
+            }
         }
     }
 

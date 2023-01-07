@@ -10,10 +10,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import java.io.File
-import java.net.URLDecoder
-import java.util.UUID
-
 import net.minestom.server.MinecraftServer
 import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.event.player.PlayerLoginEvent
@@ -24,14 +20,18 @@ import net.minestom.server.ping.ServerListPingType
 import net.swordcraft.server.database.DatabaseStorage
 import net.swordcraft.server.utils.MOTD
 import net.swordcraft.server.utils.checkResource
+import net.swordcraft.server.utils.createIfNotExists
+import java.io.File
+import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.time.Duration
+import java.util.*
 
 object Tachyon {
 
     private val localPath: String = URLDecoder.decode(Tachyon::class.java.protectionDomain.codeSource.location.path, StandardCharsets.UTF_8)
     val serverPath: String = localPath.substring(0, localPath.lastIndexOf("/"))
-
+    val schematicsFolder: File = File("$serverPath/schematics").createIfNotExists()
     val server: MinecraftServer = MinecraftServer.init()
 
     val config: YamlDocument = createInternalConfig("config.yml", "config.yml")
@@ -53,6 +53,7 @@ object Tachyon {
         buildMiniMessage()
         registerInternalListeners()
         checkOnlineMode()
+        world = MinecraftServer.getInstanceManager().createInstanceContainer()
         MinecraftServer.setBrandName(config.getString("server.brand", "SwordCraft"))
         val address = config.getString("server.address", "0.0.0.0")
         val port = config.getInt("server.port", 25565)

@@ -3,10 +3,11 @@ package net.swordcraft.server.utils
 import net.swordcraft.server.Tachyon
 import java.io.File
 
-fun File.createIfNotExists() {
+fun File.createIfNotExists(): File {
     if (!exists()) {
         createNewFile()
     }
+    return this
 }
 
 fun File.checkResource(resource: String, overwrite: Boolean = false): File {
