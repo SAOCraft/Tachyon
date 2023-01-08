@@ -11,3 +11,10 @@ spawn:
   x: 2500.0
   y: 64.0
   z: 2500.0
+
+# Needs to be formatted properly
+# filler-one: "minecraft:black_stained_glass_pane"
+# filler-two: "minecraft:gray_stained_glass_pane"
+gui:
+  filler-one: "minecraft:black_stained_glass_pane"
+  filler-two: "minecraft:gray_stained_glass_pane"

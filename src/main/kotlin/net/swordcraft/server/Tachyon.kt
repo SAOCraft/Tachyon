@@ -12,12 +12,14 @@ import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
+import net.minestom.server.event.inventory.InventoryPreClickEvent
 import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.event.player.PlayerLoginEvent
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.ping.ServerListPingType
 import net.swordcraft.server.database.DatabaseStorage
+import net.swordcraft.server.gui.inventory.GuiInventory
 import net.swordcraft.server.utils.MOTD
 import net.swordcraft.server.utils.checkResource
 import net.swordcraft.server.utils.createFolderIfNotExists
@@ -75,7 +77,14 @@ object Tachyon {
 
     @JvmStatic
     private fun registerInternalListeners() {
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent::class.java) {
+        val eventHandler = MinecraftServer.getGlobalEventHandler()
+        eventHandler.addListener(InventoryPreClickEvent::class.java) {
+            if (it.inventory is GuiInventory) {
+                it.isCancelled = true
+                (it.inventory as GuiInventory).onClick(it.player, it.slot, it.clickType)
+            }
+        }
+        eventHandler.addListener(PlayerLoginEvent::class.java) {
             it.setSpawningInstance(world)
             it.player.respawnPoint = Pos(
                 config.getDouble("spawn.x"),
@@ -83,8 +92,8 @@ object Tachyon {
                 config.getDouble("spawn.z")
             )
         }
-        MinecraftServer.getGlobalEventHandler().addListener(ServerListPingEvent::class.java) { it.responseData = if (it.pingType != ServerListPingType.MODERN_FULL_RGB) MOTD.unsupportedPing else MOTD() }
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent::class.java) {
+        eventHandler.addListener(ServerListPingEvent::class.java) { it.responseData = if (it.pingType != ServerListPingType.MODERN_FULL_RGB) MOTD.unsupportedPing else MOTD() }
+        eventHandler.addListener(PlayerDisconnectEvent::class.java) {
             if (config.getInt("server.reconnect-delay") == 0) {
                 if (users.contains(it.player.uuid)) {
                     it.player.kick(messages.getString("reconnect-delay-message"))
