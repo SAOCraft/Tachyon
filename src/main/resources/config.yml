@@ -6,3 +6,8 @@ server:
   online-mode: true
   max-players: 20
   motd: "<gradient:#ff0000:#ffff00> SwordCraft </gradient>"
+
+spawn:
+  x: 2500.0
+  y: 64.0
+  z: 2500.0

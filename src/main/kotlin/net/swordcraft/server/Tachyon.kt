@@ -11,6 +11,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.minestom.server.MinecraftServer
+import net.minestom.server.coordinate.Pos
 import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.event.player.PlayerLoginEvent
 import net.minestom.server.event.server.ServerListPingEvent
@@ -19,7 +20,7 @@ import net.minestom.server.ping.ServerListPingType
 import net.swordcraft.server.database.DatabaseStorage
 import net.swordcraft.server.utils.MOTD
 import net.swordcraft.server.utils.checkResource
-import net.swordcraft.server.utils.createIfNotExists
+import net.swordcraft.server.utils.createFolderIfNotExists
 import java.io.File
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -30,7 +31,7 @@ object Tachyon {
 
     private val localPath: String = URLDecoder.decode(Tachyon::class.java.protectionDomain.codeSource.location.path, StandardCharsets.UTF_8)
     val serverPath: String = localPath.substring(0, localPath.lastIndexOf("/"))
-    val schematicsFolder: File = File("$serverPath/schematics").createIfNotExists()
+    val schematicsFolder: File = File("$serverPath/schematics").createFolderIfNotExists()
     val server: MinecraftServer = MinecraftServer.init()
 
     val config: YamlDocument = createInternalConfig("config.yml", "config.yml")
@@ -76,6 +77,11 @@ object Tachyon {
     private fun registerInternalListeners() {
         MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent::class.java) {
             it.setSpawningInstance(world)
+            it.player.respawnPoint = Pos(
+                config.getDouble("spawn.x"),
+                config.getDouble("spawn.y"),
+                config.getDouble("spawn.z")
+            )
         }
         MinecraftServer.getGlobalEventHandler().addListener(ServerListPingEvent::class.java) { it.responseData = if (it.pingType != ServerListPingType.MODERN_FULL_RGB) MOTD.unsupportedPing else MOTD() }
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent::class.java) {
@@ -95,12 +101,13 @@ object Tachyon {
 
     @JvmStatic
     private fun buildMiniMessage() {
+        val mm: MiniMessage = MiniMessage.miniMessage()
         val messages = Tachyon.messages
         val tags = mutableListOf<TagResolver>()
         messages.keys.forEach {
             val msg = messages[it as String]
             if (msg is String)
-                tags.add(TagResolver.resolver(it, Tag.inserting(Component.text(msg))))
+                tags.add(TagResolver.resolver(it, Tag.inserting(mm.deserialize(msg))))
         }
         miniMessage = MiniMessage.builder().tags(
             TagResolver.builder()

@@ -19,3 +19,10 @@ fun File.checkResource(resource: String, overwrite: Boolean = false): File {
     }
     return this
 }
+
+fun File.createFolderIfNotExists(): File {
+    if (!exists()) {
+        mkdirs()
+    }
+    return this
+}

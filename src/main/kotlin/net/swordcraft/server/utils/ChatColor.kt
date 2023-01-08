@@ -2,10 +2,11 @@ package net.swordcraft.server.utils
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.TextDecoration
 import net.swordcraft.server.Tachyon
 
 fun String?.color(): Component {
-    return Tachyon.miniMessage.deserialize(this ?: "<red>NULL</red>")
+    return Tachyon.miniMessage.deserialize(this ?: "<red>NULL</red>").decoration(TextDecoration.ITALIC, false)
 }
 
 fun Component?.uncolor(): String {
